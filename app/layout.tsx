@@ -1,5 +1,8 @@
+// app/layout.tsx
 import type { Metadata } from "next";
+import Header from '../components/header';
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -24,8 +27,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* 
+          Загружаем model-viewer как модуль. 
+          strategy:
+            - "beforeInteractive" если нужно, чтобы web-компонент был объявлен до гидратации
+            - "afterInteractive" если достаточно загрузки сразу после того, как React отрендерился
+        */}
+        <Script
+          src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
+          strategy="beforeInteractive"
+          type="module"  
+        />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+        <Header />
+        <main>{children}</main>
       </body>
     </html>
   );
