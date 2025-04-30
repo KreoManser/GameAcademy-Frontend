@@ -8,13 +8,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 export default async function GamesList() {
   const res = await fetch(`${API_URL}/games`, { cache: 'no-store' });
-  if (!res.ok) throw new Error('Не удалось загрузить список игр');
+  if (!res.ok) throw new Error('Не удалось загрузить список проектов');
   const games: Game[] = await res.json();
 
   return (
     <main>
       <header className={styles.pageHeader}>
-        <h1>Список игр</h1>
+        <h1>Все проекты</h1>
         <Link href="/upload">
           <button className={styles.uploadButton}>➕ Загрузить новую игру</button>
         </Link>

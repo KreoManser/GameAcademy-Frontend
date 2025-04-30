@@ -17,7 +17,7 @@ export default async function PlayPage({
   return (
     <main className={styles.container}>
       <nav className={styles.breadcrumbs}>
-        <Link href="/games" className={styles.breadcrumbLink}>Игры</Link> /
+        <Link href="/games" className={styles.breadcrumbLink}>Все проекты</Link> /
         <Link href={`/games/${id}`} className={styles.breadcrumbLink}> {game.title}</Link> /
         <span> Play </span>
       </nav>
