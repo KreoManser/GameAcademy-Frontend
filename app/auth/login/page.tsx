@@ -1,13 +1,20 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import '../../globals.css'; // Или импортируйте в layout.tsx
+import styles from './login.module.css';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      router.replace('/games');
+    }
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,23 +33,36 @@ export default function LoginPage() {
       localStorage.setItem('token', data.access_token);
       router.push('/games');
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Ошибка авторизации');
-      }
+      setError(err instanceof Error ? err.message : 'Ошибка авторизации');
     }
   };
 
   return (
-    <div className="container">
-      <h1>Вход</h1>
-      <form onSubmit={handleLogin}>
-        <input type="email" placeholder="Email" value={email} onChange={(e)=>setEmail(e.target.value)} required />
-        <input type="password" placeholder="Пароль" value={password} onChange={(e)=>setPassword(e.target.value)} required />
-        <button type="submit">Войти</button>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Вход</h1>
+      <form onSubmit={handleLogin} className={styles.form}>
+        <input
+          suppressHydrationWarning
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className={styles.input}
+        />
+        <input
+          type="password"
+          placeholder="Пароль"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className={styles.input}
+        />
+        <button type="submit" className={styles.button}>
+          Войти
+        </button>
       </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className={styles.error}>{error}</p>}
     </div>
   );
 }

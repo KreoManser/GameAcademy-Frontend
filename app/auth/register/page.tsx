@@ -1,7 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import '../../globals.css';
+import styles from './register.module.css';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -10,17 +10,21 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      router.replace('/games');
+    }
+  }, [router]);
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch(
-        'http://localhost:3003/api/auth/register',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, displayName }),
-        }
-      );
+      const res = await fetch('http://localhost:3003/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, displayName }),
+      });
       const data = await res.json();
 
       if (!res.ok) {
@@ -28,27 +32,24 @@ export default function RegisterPage() {
         return;
       }
 
-      // Сохраняем токен так же, как в логине:
       if (data.access_token) {
         localStorage.setItem('token', data.access_token);
       }
 
-      // Перенаправляем на защищённую страницу
       router.push('/auth/login');
     } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : 'Ошибка регистрации'
-      );
+      setError(err instanceof Error ? err.message : 'Ошибка регистрации');
     }
   };
 
   return (
-    <div className="container">
-      <h1>Регистрация</h1>
-      <form onSubmit={handleRegister}>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Регистрация</h1>
+      <form onSubmit={handleRegister} className={styles.form}>
         <input
           type="email"
           placeholder="Email"
+          className={styles.input}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -56,6 +57,7 @@ export default function RegisterPage() {
         <input
           type="password"
           placeholder="Пароль"
+          className={styles.input}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -63,12 +65,15 @@ export default function RegisterPage() {
         <input
           type="text"
           placeholder="Имя"
+          className={styles.input}
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
         />
-        <button type="submit">Зарегистрироваться</button>
+        <button type="submit" className={styles.button}>
+          Зарегистрироваться
+        </button>
       </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className={styles.error}>{error}</p>}
     </div>
   );
 }

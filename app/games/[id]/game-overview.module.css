@@ -1,0 +1,139 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px;
+}
+
+.breadcrumbs {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.breadcrumbLink {
+    color: #0070f3;
+    text-decoration: none;
+    transition: text-decoration 0.2s ease;
+}
+
+.breadcrumbLink:hover {
+    text-decoration: underline;
+}
+
+.headerRow {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0 auto;
+    text-align: center;
+    flex: 1;
+}
+
+.backButton {
+    position: absolute;
+    left: 0;
+    background: transparent;
+    border: none;
+    color: #777;
+    font-size: 1rem;
+    padding: 4px 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.backButton:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.mediaPanel {
+    display: flex;
+    gap: 24px;
+}
+
+.media {
+    flex: 2;
+    position: relative;
+    height: 360px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+}
+
+.poster {
+    object-fit: cover;
+}
+
+.sidebar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.button {
+    display: block;
+    text-align: center;
+    padding: 12px;
+    background-color: #0070f3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.button:hover {
+    background-color: #005bb5;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    background: #eee;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+/* Блок 3D моделей */
+.modelsSection {
+    background: #fff;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.modelsTitle {
+    margin: 0 0 12px;
+    font-size: 1.2rem;
+}
+
+.modelsGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.details {
+    background: #fff;
+    padding: 16px;
+    border-radius: 8px;
+    line-height: 1.6;
+}
+
+.sectionTitle {
+    margin-top: 0;
+}

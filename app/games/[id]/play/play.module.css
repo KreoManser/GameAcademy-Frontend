@@ -1,0 +1,74 @@
+.breadcrumbs {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.breadcrumbLink {
+    color: #0070f3;
+    text-decoration: none;
+    transition: text-decoration 0.2s ease;
+}
+
+.breadcrumbLink:hover {
+    text-decoration: underline;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+}
+
+.headerRow {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+
+.title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.backButton {
+    position: absolute;
+    left: 0;
+    background: transparent;
+    border: none;
+    color: #777;
+    font-size: 1rem;
+    padding: 4px 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.backButton:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.unityCanvas {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 80vh;
+}
+
+.gameLoading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 1rem;
+}
+
+.unityCanvas {
+    width: 100% !important;
+    height: 100% !important;
+}

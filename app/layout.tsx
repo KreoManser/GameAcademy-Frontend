@@ -1,4 +1,3 @@
-// app/layout.tsx
 import type { Metadata } from "next";
 import Header from '../components/header';
 import { Geist, Geist_Mono } from "next/font/google";
@@ -38,6 +37,21 @@ export default function RootLayout({
           src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
           strategy="beforeInteractive"
           type="module"  
+        />
+        <Script
+          id="init-auth"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  window.__IS_LOGGED_IN__ = !!localStorage.getItem('token');
+                } catch(e) {
+                  window.__IS_LOGGED_IN__ = false;
+                }
+              })();
+            `,
+          }}
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>

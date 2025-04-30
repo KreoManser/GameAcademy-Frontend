@@ -3,53 +3,49 @@
 import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import styles from './header.module.css';
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // При любом изменении пути (в том числе после router.push('/games'))
-  // Заново проверяем токен в localStorage
+  const [isLoggedIn, setIsLoggedIn] = useState(() =>
+    true
+  );
+
   useEffect(() => {
-    setIsLoggedIn(!!localStorage.getItem('token'));
+    setIsLoggedIn(true);
   }, [pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    setIsLoggedIn(false);
     router.push('/auth/login');
   };
 
   return (
-    <header className="flex items-center justify-between p-4 bg-gray-100">
-      <h1 className="text-xl font-bold">
-        <Link href="/">GameAcademy</Link>
+    <header className={styles.header}>
+      <h1 className={styles.brand}>
+        <Link href="/" className={styles.brandLink}>
+          GameAcademy
+        </Link>
       </h1>
-      <nav className="space-x-4">
+      <nav className={styles.nav}>
         {isLoggedIn ? (
-          <button
-            onClick={handleLogout}
-            className="px-3 py-1 border rounded hover:bg-gray-200"
-          >
+          <button onClick={handleLogout} className={styles.button}>
             Выход
           </button>
         ) : (
           <>
-            <Link
-              href="/auth/login"
-              className="px-3 py-1 border rounded hover:bg-gray-200"
-            >
+            <Link href="/auth/login" className={styles.link}>
               Войти
             </Link>
-            <Link
-              href="/auth/register"
-              className="px-3 py-1 border rounded hover:bg-gray-200"
-            >
+            <Link href="/auth/register" className={styles.link}>
               Зарегистрироваться
             </Link>
           </>
         )}
       </nav>
     </header>
-  );
+);
 }

@@ -1,9 +1,10 @@
-// app/games/page.tsx
+
 import Link from 'next/link';
+import styles from './games.module.css';
 
 type Game = { _id: string; title: string; description: string };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 export default async function GamesList() {
   const res = await fetch(`${API_URL}/games`, { cache: 'no-store' });
@@ -11,18 +12,24 @@ export default async function GamesList() {
   const games: Game[] = await res.json();
 
   return (
-    <main style={{ padding: 20 }}>
-      <h1>Список игр</h1>
-      <Link href="/upload">
-        <button>➕ Загрузить новую игру</button>
-      </Link>
-      <ul>
+    <main>
+      <header className={styles.pageHeader}>
+        <h1>Список игр</h1>
+        <Link href="/upload">
+          <button className={styles.uploadButton}>➕ Загрузить новую игру</button>
+        </Link>
+      </header>
+
+      <ul className={styles.list}>
         {games.map((g) => (
-          <li key={g._id} style={{ margin: '10px 0' }}>
-            <h2>{g.title}</h2>
-            <p>{g.description}</p>
-            <Link href={`/games/${g._id}`}>
-              <button>Обзор ▶️</button>
+          <li key={g._id} className={styles.card}>
+            <Link href={`/games/${g._id}`} className={styles.cardLink}>
+              <div className={styles.cardImage}>🎮</div>
+              <div className={styles.cardContent}>
+                <h2 className={styles.cardTitle}>{g.title}</h2>
+                <p className={styles.cardDesc}>{g.description}</p>
+                <button className={styles.cardButton}>Обзор ▶️</button>
+              </div>
             </Link>
           </li>
         ))}

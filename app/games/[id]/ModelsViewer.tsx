@@ -1,4 +1,3 @@
-// app/games/[id]/ModelsViewer.tsx
 'use client';
 
 import React from 'react';

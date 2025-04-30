@@ -2,6 +2,7 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import styles from './upload.module.css';
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -34,54 +35,63 @@ export default function UploadPage() {
   };
 
   return (
-    <main style={{ padding: 20 }}>
-      <h1>Загрузить новую игру</h1>
-      <form onSubmit={onSubmit}>
-        <div>
-          <label>
+    <main className={styles.container}>
+      <h1 className={styles.heading}>Загрузить новую игру</h1>
+      <form onSubmit={onSubmit} className={styles.form}>
+        <div className={styles.formGroup}>
+          <label className={styles.label}>
             ZIP WebGL-билда:
-            <input type="file" accept=".zip" onChange={onFileChange} />
           </label>
+          <input
+            type="file"
+            accept=".zip"
+            onChange={onFileChange}
+            className={styles.fileInput}
+          />
         </div>
-        <div>
-          <label>
-            Название:
-            <input value={title} onChange={(e) => setTitle(e.target.value)} />
-          </label>
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Название:</label>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className={styles.input}
+            required
+          />
         </div>
-        <div>
-          <label>
-            Описание:
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </label>
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Описание:</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className={styles.textarea}
+            required
+          />
         </div>
-        <div>
-          <label>
-            <input
-              type="checkbox"
-              checked={addModels}
-              onChange={() => setAddModels(!addModels)}
-            />{' '}
-            Добавить 3D модели
-          </label>
+        <div className={styles.checkboxGroup}>
+          <input
+            type="checkbox"
+            checked={addModels}
+            onChange={() => setAddModels(!addModels)}
+          />
+          <label>Добавить 3D модели</label>
         </div>
         {addModels && (
-          <div>
-            <label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
               Выбрать модели (.glb, .gltf и т.п.):
-              <input
-                type="file"
-                accept=".glb,.gltf"
-                multiple
-                onChange={onModelsChange}
-              />
             </label>
+            <input
+              type="file"
+              accept=".glb,.gltf"
+              multiple
+              onChange={onModelsChange}
+              className={styles.fileInput}
+            />
           </div>
         )}
-        <button type="submit">Загрузить</button>
+        <button type="submit" className={styles.submitButton}>
+          Загрузить
+        </button>
       </form>
     </main>
   );
