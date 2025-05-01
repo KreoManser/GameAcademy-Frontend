@@ -38,21 +38,6 @@ export default function RootLayout({
           strategy="beforeInteractive"
           type="module"  
         />
-        <Script
-          id="init-auth"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  window.__IS_LOGGED_IN__ = !!localStorage.getItem('token');
-                } catch(e) {
-                  window.__IS_LOGGED_IN__ = false;
-                }
-              })();
-            `,
-          }}
-        />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Header />

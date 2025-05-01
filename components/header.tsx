@@ -8,18 +8,14 @@ import styles from './header.module.css';
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-
-  const [isLoggedIn, setIsLoggedIn] = useState(() =>
-    true
-  );
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    setIsLoggedIn(true);
+    setIsLoggedIn(!!localStorage.getItem('token'));
   }, [pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    setIsLoggedIn(false);
     router.push('/auth/login');
   };
 
@@ -47,5 +43,5 @@ export default function Header() {
         )}
       </nav>
     </header>
-);
+  );
 }
