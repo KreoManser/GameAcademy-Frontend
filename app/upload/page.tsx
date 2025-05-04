@@ -43,6 +43,7 @@ export default function UploadPage() {
   }, [router]);
 
   const [file, setFile] = useState<File | null>(null);
+  const [cover, setCover] = useState<File | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
@@ -53,6 +54,9 @@ export default function UploadPage() {
 
   const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) setFile(e.target.files[0]);
+  };
+  const onCoverChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) setCover(e.target.files[0]);
   };
   const onModelsChange = (e: ChangeEvent<HTMLInputElement>) => {
     setModels(e.target.files);
@@ -76,8 +80,13 @@ export default function UploadPage() {
       alert('Выберите ZIP-файл');
       return;
     }
+    if (!cover) {
+        alert('Выберите главное фото (cover)')
+        return
+    }
     const form = new FormData();
     form.append('file', file);
+    form.append('cover', cover);
     form.append('title', title);
     form.append('description', description);
     form.append('uploader', uploader);
@@ -114,6 +123,18 @@ export default function UploadPage() {
             className={styles.fileInput}
             required
           />
+        </div>
+
+        {/* Cover */}
+        <div className={styles.formGroup}>
+          <label>Главное фото (cover):</label>
+          <input 
+            type="file" 
+            accept="image/*" 
+            onChange={onCoverChange} 
+            required 
+            className={styles.fileInput}
+        />
         </div>
 
         {/* Title */}
