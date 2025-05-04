@@ -56,15 +56,24 @@
 .mediaPanel {
     display: flex;
     gap: 24px;
+    align-items: flex-start;
 }
 
-.media {
+.mediaPanel {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+/* первый ребёнок — это ваш <MediaGallery> */
+.mediaPanel> :first-child {
     flex: 2;
-    position: relative;
-    height: 360px;
-    border-radius: 8px;
-    overflow: hidden;
-    background: #000;
+    /* 2 части */
+}
+
+.sidebar {
+    flex: 1;
+    /* 1 часть */
 }
 
 .poster {
@@ -136,4 +145,41 @@
 
 .sectionTitle {
     margin-top: 0;
+}
+
+/* картинки */
+.imagesGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.imageItem {
+    position: relative;
+    flex: 1 1 calc(33.333% - 12px);
+    min-width: 120px;
+    aspect-ratio: 16 / 9;
+    /* или любой другой */
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+/* видео */
+.videosSection {
+    margin: 24px 0;
+}
+
+.videosGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.videoItem {
+    flex: 0 0 45%;
+    max-width: 45%;
+    height: auto;
+    border-radius: 4px;
+    background: #000;
 }
