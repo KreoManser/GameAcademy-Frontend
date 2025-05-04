@@ -1,3 +1,4 @@
+// app/games/page.tsx
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
@@ -17,40 +18,60 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL!
 const IMAGES_BASE = process.env.NEXT_PUBLIC_MINIO_IMAGES_BASE_URL!
 
 export default function GamesList() {
-  const [games, setGames] = useState<Game[]>([])
+  const [allGames, setAllGames] = useState<Game[]>([])
+  const [searchResults, setSearchResults] = useState<Game[]>([])
   const [q, setQ] = useState('')
   const [open, setOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
+  // загрузка полного списка один раз
   useEffect(() => {
-    const fetchGames = async () => {
-      const url = new URL(`${API_URL}/games`)
-      if (q) url.searchParams.set('q', q)
-      const res = await fetch(url.toString())
-      setGames(await res.json())
+    fetch(`${API_URL}/games`)
+      .then(r => r.json())
+      .then((data: Game[]) => setAllGames(data))
+  }, [])
+
+  // при каждом изменении q — запрашиваем только результаты
+  useEffect(() => {
+    if (!q) {
+      setSearchResults([])
+      return
     }
-    fetchGames()
+    const url = new URL(`${API_URL}/games`)
+    url.searchParams.set('q', q)
+    fetch(url.toString())
+      .then(r => r.json())
+      .then((data: Game[]) => setSearchResults(data))
   }, [q])
 
+  // закрытие при клике вне поля и вне дропдауна
   useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (inputRef.current && !inputRef.current.contains(e.target as Node)) {
+    const onMouseDown = (e: MouseEvent) => {
+      const tgt = e.target as Node
+      if (
+        inputRef.current &&
+        dropdownRef.current &&
+        !inputRef.current.contains(tgt) &&
+        !dropdownRef.current.contains(tgt)
+      ) {
         setOpen(false)
       }
     }
-    document.addEventListener('mousedown', onClick)
-    return () => document.removeEventListener('mousedown', onClick)
+    document.addEventListener('mousedown', onMouseDown)
+    return () => document.removeEventListener('mousedown', onMouseDown)
   }, [])
 
+  // позиционирование выпадашки
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
   useEffect(() => {
     if (open && inputRef.current) {
-      const r = inputRef.current.getBoundingClientRect()
+      const rect = inputRef.current.getBoundingClientRect()
       setDropdownStyle({
         position: 'absolute',
-        top: r.bottom + window.scrollY + 4,
-        left: r.left + window.scrollX,
-        width: r.width,
+        top: rect.bottom + window.scrollY + 16,
+        left: rect.left + window.scrollX,
+        width: rect.width,
         maxHeight: '70vh',
         overflowY: 'auto',
         zIndex: 2000,
@@ -58,14 +79,15 @@ export default function GamesList() {
     }
   }, [open])
 
+  const results = q ? searchResults : []
+
   return (
     <main>
-      {/* контейнер с паддингом, совпадает с отступами грида */}
       <div className={styles.container}>
         <header className={styles.pageHeader}>
           <h1>Все проекты</h1>
           <Link href="/upload">
-            <button className={styles.uploadButton}>➕ Новый проект</button>
+            <button className={styles.uploadButton}>Новый проект</button>
           </Link>
         </header>
 
@@ -83,14 +105,46 @@ export default function GamesList() {
       </div>
 
       {open && q && createPortal(
-        <div style={dropdownStyle} className={styles.dropdown}>
-          {games.length > 0 ? games.map(g => (
-            <Link
-              key={g._id}
-              href={`/games/${g._id}`}
-              className={styles.dropdownItem}
-              onClick={() => setOpen(false)}
-            >
+        <>
+          {results.length > 0 && <div className={styles.backdrop} />}
+          <div ref={dropdownRef} style={dropdownStyle} className={styles.dropdown}>
+            {results.length > 0 ? (
+              results.map(g => (
+                <Link
+                  key={g._id}
+                  href={`/games/${g._id}`}
+                  className={styles.dropdownItem}
+                >
+                  <div className={styles.cardImage}>
+                    {g.cover
+                      ? <Image
+                          src={`${IMAGES_BASE}/${encodeURIComponent(g.cover)}`}
+                          alt={g.title}
+                          fill
+                          style={{ objectFit: 'cover' }}
+                          unoptimized
+                        />
+                      : <div className={styles.cardIcon}>🎮</div>
+                    }
+                  </div>
+                  <div className={styles.cardContent}>
+                    <h2 className={styles.cardTitle}>{g.title}</h2>
+                    <p className={styles.cardDesc}>{g.description}</p>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className={styles.noResults}>Ничего не найдено</div>
+            )}
+          </div>
+        </>,
+        document.body
+      )}
+
+      <ul className={styles.list}>
+        {allGames.map(g => (
+          <li key={g._id} className={styles.card}>
+            <Link href={`/games/${g._id}`} className={styles.cardLink}>
               <div className={styles.cardImage}>
                 {g.cover
                   ? <Image
@@ -106,42 +160,12 @@ export default function GamesList() {
               <div className={styles.cardContent}>
                 <h2 className={styles.cardTitle}>{g.title}</h2>
                 <p className={styles.cardDesc}>{g.description}</p>
+                <button className={styles.cardButton}>Обзор</button>
               </div>
             </Link>
-          )) : (
-            <div className={styles.noResults}>Ничего не найдено</div>
-          )}
-        </div>,
-        document.body
-      )}
-
-      {!open && (
-        <ul className={styles.list}>
-          {games.map(g => (
-            <li key={g._id} className={styles.card}>
-              <Link href={`/games/${g._id}`} className={styles.cardLink}>
-                <div className={styles.cardImage}>
-                  {g.cover
-                    ? <Image
-                        src={`${IMAGES_BASE}/${encodeURIComponent(g.cover)}`}
-                        alt={g.title}
-                        fill
-                        style={{ objectFit: 'cover' }}
-                        unoptimized
-                      />
-                    : <div className={styles.cardIcon}>🎮</div>
-                  }
-                </div>
-                <div className={styles.cardContent}>
-                  <h2 className={styles.cardTitle}>{g.title}</h2>
-                  <p className={styles.cardDesc}>{g.description}</p>
-                  <button className={styles.cardButton}>Обзор ▶️</button>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+          </li>
+        ))}
+      </ul>
     </main>
   )
 }

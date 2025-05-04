@@ -42,8 +42,10 @@ export default function MediaGallery({
             alt=""
             fill
             style={{ objectFit: 'contain' }}
-            unoptimized
-          />
+            sizes="(max-width: 768px) 100vw, 66vw"
+            quality={90}
+            priority
+            />
         ) : (
           <video
             src={`${videosBase}/${encodeURIComponent(selected.key)}`}

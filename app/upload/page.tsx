@@ -1,19 +1,18 @@
 'use client';
 
-function parseJwt<T extends Record<string, unknown>>(token: string): T {
-  const payload = token.split('.')[1];
-  // atob возвращает строку, JSON.parse она же возвращает unknown
-  return JSON.parse(atob(payload)) as T;
-}
-
-import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
+import { useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import styles from './upload.module.css';
 
-type JwtPayload = { sub: string; /* плюс остальные поля если нужны */ };
+function parseJwt<T extends Record<string, unknown>>(token: string): T {
+  const payload = token.split('.')[1];
+  return JSON.parse(atob(payload)) as T;
+}
 
-const GENRES = [
+type JwtPayload = { sub: string };
+
+const ALL_GENRES = [
   'Экшен',
   'Приключения',
   'Адвенчура',
@@ -25,8 +24,6 @@ const GENRES = [
 
 export default function UploadPage() {
   const router = useRouter();
-
-  // текущий пользователь
   const [uploader, setUploader] = useState<string>('');
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -42,16 +39,26 @@ export default function UploadPage() {
     }
   }, [router]);
 
+  // --- обычные поля формы ---
   const [file, setFile] = useState<File | null>(null);
   const [cover, setCover] = useState<File | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+
+  // --- жанры мультиселект ---
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [genreSearch, setGenreSearch] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const genreRef = useRef<HTMLDivElement>(null);
+  const genreInputRef = useRef<HTMLInputElement>(null);
+
+  // --- остальные файлы ---
   const [addModels, setAddModels] = useState(false);
   const [models, setModels] = useState<FileList | null>(null);
   const [images, setImages] = useState<FileList | null>(null);
   const [videos, setVideos] = useState<FileList | null>(null);
 
+  // обработчики file inputs
   const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) setFile(e.target.files[0]);
   };
@@ -69,42 +76,47 @@ export default function UploadPage() {
   };
 
   const toggleGenre = (genre: string) => {
-    setSelectedGenres((prev) =>
-      prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre]
+    setSelectedGenres(prev =>
+      prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
     );
   };
 
+  // закрываем дропдаун кликом вне компонента жанров
+  useEffect(() => {
+    const onClickOutside = (e: MouseEvent) => {
+      if (genreRef.current && !genreRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+        setGenreSearch('');
+      }
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, []);
+
+  // жанры, подходящие под поиск и ещё не выбранные
+  const filteredGenres = ALL_GENRES.filter(
+    g =>
+      g.toLowerCase().includes(genreSearch.toLowerCase()) &&
+      !selectedGenres.includes(g)
+  );
+
+  // отправка
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!file) {
-      alert('Выберите ZIP-файл');
-      return;
-    }
-    if (!cover) {
-        alert('Выберите главное фото (cover)')
-        return
-    }
+    if (!file) return alert('Выберите ZIP-файл');
+    if (!cover) return alert('Выберите главное фото');
     const form = new FormData();
     form.append('file', file);
     form.append('cover', cover);
     form.append('title', title);
     form.append('description', description);
     form.append('uploader', uploader);
-    // отправляем каждый жанр отдельно — NestJS соберёт их в массив
-    selectedGenres.forEach((g) => form.append('genres', g));
-
-    if (addModels && models) {
-      Array.from(models).forEach((m) => form.append('models', m));
-    }
-    if (images) {
-      Array.from(images).forEach((img) => form.append('images', img));
-    }
-    if (videos) {
-      Array.from(videos).forEach((vid) => form.append('videos', vid));
-    }
-
+    selectedGenres.forEach(g => form.append('genres', g));
+    if (addModels && models) Array.from(models).forEach(m => form.append('models', m));
+    if (images) Array.from(images).forEach(img => form.append('images', img));
+    if (videos) Array.from(videos).forEach(vid => form.append('videos', vid));
     await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/games`, form, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': 'multipart/form-data' }
     });
     router.push('/games');
   };
@@ -112,8 +124,8 @@ export default function UploadPage() {
   return (
     <main className={styles.container}>
       <h1 className={styles.heading}>Загрузить новую игру</h1>
-      <form suppressHydrationWarning onSubmit={onSubmit} className={styles.form}>
-        {/* Build ZIP */}
+      <form onSubmit={onSubmit} className={styles.form}>
+        {/* ZIP Build */}
         <div className={styles.formGroup}>
           <label className={styles.label}>ZIP WebGL-билда:</label>
           <input
@@ -124,71 +136,106 @@ export default function UploadPage() {
             required
           />
         </div>
-
         {/* Cover */}
         <div className={styles.formGroup}>
-          <label>Главное фото (cover):</label>
-          <input 
-            type="file" 
-            accept="image/*" 
-            onChange={onCoverChange} 
-            required 
+          <label className={styles.label}>Главное фото (cover):</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={onCoverChange}
             className={styles.fileInput}
-        />
+            required
+          />
         </div>
-
         {/* Title */}
         <div className={styles.formGroup}>
           <label className={styles.label}>Название:</label>
           <input
             className={styles.input}
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={e => setTitle(e.target.value)}
             required
           />
         </div>
-
         {/* Description */}
         <div className={styles.formGroup}>
           <label className={styles.label}>Описание:</label>
           <textarea
             className={styles.textarea}
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={e => setDescription(e.target.value)}
             required
           />
         </div>
-
-        {/* Genres */}
-        <div className={styles.formGroup}>
+        {/* Genres Multi-Select */}
+        <div className={styles.formGroup} ref={genreRef}>
           <label className={styles.label}>Жанры:</label>
-          <div className={styles.checkboxList}>
-            {GENRES.map((genre) => (
-              <label key={genre} className={styles.checkboxItem}>
-                <input
-                  type="checkbox"
-                  checked={selectedGenres.includes(genre)}
-                  onChange={() => toggleGenre(genre)}
-                />
-                {genre}
-              </label>
-            ))}
+          <div className={styles.genreSelect} onClick={() => { /* клики внутри не закроют */ }}>
+            <div className={styles.selectedContainer}>
+              {selectedGenres.map(g => (
+                <span
+                  key={g}
+                  className={styles.genreBadge}
+                  onClick={e => e.stopPropagation()}
+                >
+                  {g}{' '}
+                  <button
+                    type="button"
+                    onClick={() => toggleGenre(g)}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+              <input
+                ref={genreInputRef}
+                type="text"
+                placeholder="Поиск жанров…"
+                className={styles.genreInput}
+                value={genreSearch}
+                onChange={e => {
+                  setGenreSearch(e.target.value);
+                  setDropdownOpen(true);
+                }}
+                onFocus={() => setDropdownOpen(true)}
+              />
+            </div>
+            {dropdownOpen && (
+              <ul className={styles.genreDropdown}>
+                {filteredGenres.length > 0 ? (
+                  filteredGenres.map(g => (
+                    <li
+                      key={g}
+                      className={styles.genreItem}
+                      onClick={() => {
+                        toggleGenre(g);
+                        setGenreSearch('');
+                        genreInputRef.current?.focus();
+                      }}
+                    >
+                      {g}
+                    </li>
+                  ))
+                ) : (
+                  <li className={styles.noResults}>Нет жанров</li>
+                )}
+              </ul>
+            )}
           </div>
         </div>
-
         {/* Add Models */}
         <div className={styles.checkboxGroup}>
           <input
             type="checkbox"
             checked={addModels}
-            onChange={() => setAddModels(!addModels)}
+            onChange={() => setAddModels(v => !v)}
           />
           <label>Добавить 3D модели</label>
         </div>
         {addModels && (
           <div className={styles.formGroup}>
             <label className={styles.label}>
-              Выбрать модели (.glb, .gltf и т.п.):
+              Выбрать модели (.glb, .gltf):
             </label>
             <input
               type="file"
@@ -199,7 +246,6 @@ export default function UploadPage() {
             />
           </div>
         )}
-
         {/* Images */}
         <div className={styles.formGroup}>
           <label className={styles.label}>Изображения игры:</label>
@@ -211,7 +257,6 @@ export default function UploadPage() {
             className={styles.fileInput}
           />
         </div>
-
         {/* Videos */}
         <div className={styles.formGroup}>
           <label className={styles.label}>Видео:</label>
@@ -223,7 +268,6 @@ export default function UploadPage() {
             className={styles.fileInput}
           />
         </div>
-
         {/* Submit */}
         <button type="submit" className={styles.submitButton}>
           Загрузить

@@ -80,3 +80,70 @@
 .submitButton:hover {
     background-color: #005bb5;
 }
+
+/* app/upload/upload.module.css */
+.genreSelect {
+    position: relative;
+}
+
+.selectedContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: text;
+}
+
+.genreBadge {
+    background: #eef;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.genreBadge button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.genreInput {
+    flex: 1;
+    border: none;
+    outline: none;
+    min-width: 80px;
+}
+
+.genreDropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    max-height: 150px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    z-index: 10;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.genreItem {
+    padding: 6px 8px;
+    cursor: pointer;
+}
+
+.genreItem:hover {
+    background: #f0f0f0;
+}
+
+.noResults {
+    padding: 6px 8px;
+    color: #777;
+}
