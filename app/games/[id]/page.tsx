@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import ModelsViewerWrapper from './ModelsViewerWrapper';
 import MediaGallery from './MediaGallery';
 import styles from './game-overview.module.css';
@@ -9,7 +10,8 @@ type Game = {
   models: string[];
   images: string[];
   videos: string[];
-  tags?: string[];
+  genres: string[];
+  cover?: string;
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
@@ -52,6 +54,26 @@ export default async function GameOverview({
         />
 
         <aside className={styles.sidebar}>
+          {game.cover && (
+            <div className={styles.coverContainer}>
+              <Image
+                src={`${IMAGES_BASE}/${encodeURIComponent(game.cover)}`}
+                alt={game.title}
+                fill
+                className={styles.coverImage}
+                unoptimized
+              />
+            </div>
+          )}
+          {game.genres && game.genres.length > 0 && (
+            <div className={styles.tags}>
+              {game.genres.map((g) => (
+                <span key={g} className={styles.tag}>
+                  {g}
+                </span>
+              ))}
+            </div>
+          )}
           <Link href={`/games/${id}/play`} className={styles.button}>
             Играть ▶️
           </Link>
@@ -62,15 +84,6 @@ export default async function GameOverview({
           >
             GitHub
           </Link>
-          {game.tags && (
-            <div className={styles.tags}>
-              {game.tags.map((tag) => (
-                <span key={tag} className={styles.tag}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
         </aside>
       </div>
 

@@ -59,32 +59,32 @@
     align-items: flex-start;
 }
 
-.mediaPanel {
-    display: flex;
-    gap: 24px;
-    align-items: flex-start;
-}
-
 /* первый ребёнок — это ваш <MediaGallery> */
 .mediaPanel> :first-child {
     flex: 2;
-    /* 2 части */
-}
-
-.sidebar {
-    flex: 1;
-    /* 1 часть */
-}
-
-.poster {
-    object-fit: cover;
 }
 
 .sidebar {
     flex: 1;
     display: flex;
+    max-width: 320px;
     flex-direction: column;
     gap: 16px;
+}
+
+/* контейнер для cover */
+.coverContainer {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 12px;
+    overflow: hidden;
+    background: transparent;
+}
+
+/* если Next.js оборачивает картинку — это правило применится к самому <img> */
+.coverContainer img {
+    border-radius: 12px !important;
 }
 
 .button {
@@ -112,13 +112,13 @@
 }
 
 .tag {
-    background: #eee;
+    background-color: #0070f3;
+    color: #fff;
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 0.85rem;
 }
 
-/* Блок 3D моделей */
 .modelsSection {
     background: #fff;
     padding: 16px;
@@ -147,7 +147,6 @@
     margin-top: 0;
 }
 
-/* картинки */
 .imagesGrid {
     display: flex;
     flex-wrap: wrap;
@@ -159,13 +158,11 @@
     position: relative;
     flex: 1 1 calc(33.333% - 12px);
     min-width: 120px;
-    aspect-ratio: 16 / 9;
-    /* или любой другой */
+    aspect-ratio: 16/9;
     overflow: hidden;
     border-radius: 4px;
 }
 
-/* видео */
 .videosSection {
     margin: 24px 0;
 }
@@ -181,5 +178,5 @@
     max-width: 45%;
     height: auto;
     border-radius: 4px;
-    background: #000;
+    background: transparent;
 }
