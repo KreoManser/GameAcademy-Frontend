@@ -1,5 +1,4 @@
 .container {
-    /* тёмный градиентный фон с лёгкой игрой световых бликов */
     background:
         radial-gradient(circle at 20% 20%, rgba(0, 112, 243, 0.15), transparent 60%),
         linear-gradient(135deg, #121212 0%, #1f1f1f 100%);
@@ -12,7 +11,6 @@
 }
 
 .hero {
-    /* полупрозрачная панель над фоном */
     background: rgba(255, 255, 255, 0.04);
     backdrop-filter: blur(8px);
     border-radius: 8px;
@@ -28,6 +26,7 @@
     margin: 0;
     line-height: 1.2;
     background: linear-gradient(90deg, #0070f3, #00c6ff);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: slideUp 0.8s ease-out forwards;
@@ -35,6 +34,7 @@
 
 .highlight {
     background: linear-gradient(90deg, #00c6ff, #0070f3);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }

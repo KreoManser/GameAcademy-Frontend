@@ -1,7 +1,7 @@
 // app/games/[id]/CommentsSection.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import styles from './comments.module.css';
 
 type Comment = {
@@ -35,9 +35,9 @@ export default function CommentsSection({ gameId }: { gameId: string }) {
   setComments(payload.comments || []);
 };
 
-  useEffect(() => {
-    fetchComments();
-  }, [gameId]);
+//   useEffect(() => {
+//     fetchComments();
+//   }, [gameId]);
 
   const post = async () => {
   const token = localStorage.getItem('token');

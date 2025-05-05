@@ -1,4 +1,3 @@
-// app/layout.tsx
 import type { Metadata } from 'next'
 import Header from '../components/header'
 import Script from 'next/script'
@@ -28,7 +27,6 @@ export default function RootLayout({
       <body>
         <Header />
         <UnityCleanup />
-        {/* здесь обёртываем всё содержимое клиентским компонентом */}
         <ClientWrapper className="mainContent">
           {children}
         </ClientWrapper>

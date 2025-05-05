@@ -1,4 +1,3 @@
-// app/profile/page.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -9,7 +8,6 @@ import styles from './profile.module.css'
 const AUTH_API = process.env.NEXT_PUBLIC_API_URL_API!
 const GAMES_API = process.env.NEXT_PUBLIC_API_URL!
 
-// Простой JWT-парсер для получения поля sub
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseJwt<T extends Record<string, any>>(token: string): T {
   const base64Url = token.split('.')[1]
@@ -52,7 +50,6 @@ export default function ProfilePage() {
       }
 
       try {
-        // 1) Получаем профиль
         const resProfile = await fetch(`${AUTH_API}/user/info`, {
           method: 'POST',
           headers: {
@@ -65,7 +62,6 @@ export default function ProfilePage() {
         const { profile } = await resProfile.json() as { profile: Profile }
         setProfile(profile)
 
-        // 2) Получаем игры этого пользователя
         const resGames = await fetch(
           `${GAMES_API}/games?uploader=${encodeURIComponent(profile.email)}`,
           { cache: 'no-store' }

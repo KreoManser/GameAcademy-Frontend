@@ -13,7 +13,7 @@ export default function ClientGame({ prefix, canvasClass }: ClientGameProps) {
   const base = `${process.env.NEXT_PUBLIC_MINIO_BASE_URL}/${prefix}Build/`
   const {
     unityProvider,
-    unload,                // ← unload helper
+    unload,
     loadingProgression,
     isLoaded,
   } = useUnityContext({
@@ -27,7 +27,6 @@ export default function ClientGame({ prefix, canvasClass }: ClientGameProps) {
     return () => {
       if (typeof unload === 'function') {
         unload().catch((e) => {
-          // now we swallow every rejection (even `undefined`)
           console.debug('Unity unload failed (ignored):', e)
         })
       }

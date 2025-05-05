@@ -25,7 +25,6 @@ const ALL_GENRES = [
 export default function UploadPage() {
   const router = useRouter();
 
-  // Получаем user id из токена
   const [uploader, setUploader] = useState<string>('');
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -40,7 +39,6 @@ export default function UploadPage() {
     }
   }, [router]);
 
-  // Форма
   const [playable, setPlayable] = useState(false);
   const [gitUrl, setGitUrl] = useState('');
   const [zipFile, setZipFile] = useState<File | null>(null);
@@ -77,7 +75,6 @@ export default function UploadPage() {
     );
   };
 
-  // Закрытие выпадашки жанров по клику вне
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (genreRef.current && !genreRef.current.contains(e.target as Node)) {
@@ -95,7 +92,6 @@ export default function UploadPage() {
       !selectedGenres.includes(g)
   );
 
-  // Отправка формы
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (playable && !zipFile) {

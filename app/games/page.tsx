@@ -1,4 +1,3 @@
-// app/games/page.tsx
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
@@ -27,14 +26,12 @@ export default function GamesList() {
   const inputRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // загрузка полного списка один раз
   useEffect(() => {
     fetch(`${API_URL}/games`)
       .then(r => r.json())
       .then((data: Game[]) => setAllGames(data))
   }, [])
 
-  // при каждом изменении q — запрашиваем только результаты
   useEffect(() => {
     if (!q) {
       setSearchResults([])
@@ -47,7 +44,6 @@ export default function GamesList() {
       .then((data: Game[]) => setSearchResults(data))
   }, [q])
 
-  // закрытие при клике вне поля и вне дропдауна
   useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
       const tgt = e.target as Node
@@ -64,7 +60,6 @@ export default function GamesList() {
     return () => document.removeEventListener('mousedown', onMouseDown)
   }, [])
 
-  // позиционирование выпадашки
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
   useEffect(() => {
     if (open && inputRef.current) {

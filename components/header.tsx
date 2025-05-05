@@ -1,4 +1,3 @@
-// components/header.tsx
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -13,12 +12,10 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const avatarWrapperRef = useRef<HTMLDivElement>(null);
 
-  // обновляем статус залогинил ли пользователь
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem('token'));
   }, [pathname]);
 
-  // 1. Закрываем меню при клике вне области аватара
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -33,7 +30,6 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [menuOpen]);
 
-  // 2. Закрываем меню при смене маршрута
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
