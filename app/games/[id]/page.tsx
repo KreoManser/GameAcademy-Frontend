@@ -48,15 +48,20 @@ export default async function GameOverview({
         <h1 className={styles.title}>{game.title}</h1>
       </div>
 
-      <div className={styles.mediaPanel}>
-        <MediaGallery
-          images={game.images}
-          videos={game.videos}
-          imagesBase={IMAGES_BASE}
-          videosBase={VIDEOS_BASE}
-        />
+      {/* === ТОП: две колонки === */}
+      <div className={styles.topRow}>
+        {/* 1. Большая медиапанель */}
+        <div className={`${styles.glassBlock} ${styles.mediaBlock}`}>
+          <MediaGallery
+            images={game.images}
+            videos={game.videos}
+            imagesBase={IMAGES_BASE}
+            videosBase={VIDEOS_BASE}
+          />
+        </div>
 
-        <aside className={styles.sidebar}>
+        {/* 2. Боковая панель с cover + кнопками */}
+        <div className={`${styles.glassBlock} ${styles.sidebarBlock}`}>
           {game.cover && (
             <div className={styles.coverContainer}>
               <Image
@@ -68,30 +73,25 @@ export default async function GameOverview({
               />
             </div>
           )}
-          {game.genres && game.genres.length > 0 && (
+          {game.genres?.length > 0 && (
             <div className={styles.tags}>
-              {game.genres.map((g) => (
-                <span key={g} className={styles.tag}>
-                  {g}
-                </span>
+              {game.genres.map(g => (
+                <span key={g} className={styles.tag}>{g}</span>
               ))}
             </div>
           )}
           {game.playable && (
-            <Link href={`/games/${id}/play`} className={styles.button}>
-                Играть ▶️
-            </Link>
-            )}
-            {game.githubUrl && (
-            <Link href={game.githubUrl} target="_blank" className={styles.button}>
-                GitHub
-            </Link>
-            )}
-        </aside>
+            <Link href={`/games/${id}/play`} className={styles.button}>Играть ▶️</Link>
+          )}
+          {game.githubUrl && (
+            <Link href={game.githubUrl} target="_blank" className={styles.button}>GitHub</Link>
+          )}
+        </div>
       </div>
 
+      {/* === Блок 3: 3D модели === */}
       {game.models.length > 0 && (
-        <section className={styles.modelsSection}>
+        <section className={`${styles.glassBlock} ${styles.modelsSection}`}>
           <h2 className={styles.modelsTitle}>3D Модели</h2>
           <div className={styles.modelsGrid}>
             <ModelsViewerWrapper models={game.models} baseUrl={MODELS_BASE} />
@@ -99,11 +99,12 @@ export default async function GameOverview({
         </section>
       )}
 
-      <section className={styles.details}>
+      {/* === Блок 4: Описание === */}
+      <section className={`${styles.glassBlock} ${styles.details}`}>
         <h2 className={styles.sectionTitle}>Описание</h2>
         <p>{game.description}</p>
       </section>
-      {/* <CommentsSection gameId={id} /> */}
+
     </main>
   );
 }

@@ -1,8 +1,50 @@
+/* === общий контейнер === */
 .container {
     display: flex;
     flex-direction: column;
     gap: 24px;
     padding: 24px;
+}
+
+/* === первая строка: media + sidebar === */
+.topRow {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+}
+
+/* “стеклянный” общий стиль */
+.glassBlock {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.10);
+    padding: 20px;
+}
+
+/* конкретные расширения, если нужны */
+.mediaBlock {
+    /* медиапанельу можно дать min-height */
+    min-height: 300px;
+}
+
+.sidebarBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* coverContainer, tags, button — остаются без изменений */
+.coverContainer {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.coverContainer img {
+    border-radius: 12px !important;
 }
 
 .breadcrumbs {
@@ -94,7 +136,7 @@
     background-color: #0070f3;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     font-weight: 600;
     cursor: pointer;
     text-decoration: none;
@@ -120,9 +162,7 @@
 }
 
 .modelsSection {
-    background: #fff;
-    padding: 16px;
-    border-radius: 8px;
+    padding: 24px;
 }
 
 .modelsTitle {
@@ -137,9 +177,7 @@
 }
 
 .details {
-    background: #fff;
-    padding: 16px;
-    border-radius: 8px;
+    padding: 24px;
     line-height: 1.6;
 }
 
