@@ -6,6 +6,7 @@ import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import Image from 'next/image'
 import styles from './games.module.css'
+import { usePathname } from 'next/navigation'
 
 type Game = {
   _id: string
@@ -18,6 +19,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL!
 const IMAGES_BASE = process.env.NEXT_PUBLIC_MINIO_IMAGES_BASE_URL!
 
 export default function GamesList() {
+    const pathname = usePathname()
   const [allGames, setAllGames] = useState<Game[]>([])
   const [searchResults, setSearchResults] = useState<Game[]>([])
   const [q, setQ] = useState('')
@@ -91,7 +93,7 @@ export default function GamesList() {
           </Link>
         </header>
 
-        <div className={styles.searchWrapper}>
+        <div className={styles.searchWrapper} key={pathname}>
           <input
             ref={inputRef}
             type="text"

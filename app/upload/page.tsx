@@ -24,6 +24,8 @@ const ALL_GENRES = [
 
 export default function UploadPage() {
   const router = useRouter();
+
+  // Получаем user id из токена
   const [uploader, setUploader] = useState<string>('');
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -32,39 +34,34 @@ export default function UploadPage() {
       return;
     }
     try {
-      const { sub } = parseJwt<JwtPayload>(token);
-      setUploader(sub);
+      setUploader(parseJwt<JwtPayload>(token).sub);
     } catch {
       router.push('/auth/login');
     }
   }, [router]);
 
-  // --- обычные поля формы ---
-  const [file, setFile] = useState<File | null>(null);
+  // Форма
+  const [playable, setPlayable] = useState(false);
+  const [gitUrl, setGitUrl] = useState('');
+  const [zipFile, setZipFile] = useState<File | null>(null);
   const [cover, setCover] = useState<File | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
-  // --- жанры мультиселект ---
+  // Жанры мультиселект
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [genreSearch, setGenreSearch] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const genreRef = useRef<HTMLDivElement>(null);
   const genreInputRef = useRef<HTMLInputElement>(null);
 
-  // --- остальные файлы ---
+  // Дополнительные файлы
   const [addModels, setAddModels] = useState(false);
   const [models, setModels] = useState<FileList | null>(null);
   const [images, setImages] = useState<FileList | null>(null);
   const [videos, setVideos] = useState<FileList | null>(null);
 
-  // обработчики file inputs
-  const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) setFile(e.target.files[0]);
-  };
-  const onCoverChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) setCover(e.target.files[0]);
-  };
+  // Хэндлеры
   const onModelsChange = (e: ChangeEvent<HTMLInputElement>) => {
     setModels(e.target.files);
   };
@@ -74,49 +71,68 @@ export default function UploadPage() {
   const onVideosChange = (e: ChangeEvent<HTMLInputElement>) => {
     setVideos(e.target.files);
   };
-
   const toggleGenre = (genre: string) => {
     setSelectedGenres(prev =>
       prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
     );
   };
 
-  // закрываем дропдаун кликом вне компонента жанров
+  // Закрытие выпадашки жанров по клику вне
   useEffect(() => {
-    const onClickOutside = (e: MouseEvent) => {
+    const handleClick = (e: MouseEvent) => {
       if (genreRef.current && !genreRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
         setGenreSearch('');
       }
     };
-    document.addEventListener('mousedown', onClickOutside);
-    return () => document.removeEventListener('mousedown', onClickOutside);
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  // жанры, подходящие под поиск и ещё не выбранные
   const filteredGenres = ALL_GENRES.filter(
     g =>
       g.toLowerCase().includes(genreSearch.toLowerCase()) &&
       !selectedGenres.includes(g)
   );
 
-  // отправка
+  // Отправка формы
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!file) return alert('Выберите ZIP-файл');
-    if (!cover) return alert('Выберите главное фото');
+    if (playable && !zipFile) {
+      alert('Выберите ZIP-файл для WebGL-билда');
+      return;
+    }
+    if (!cover) {
+      alert('Выберите главное фото');
+      return;
+    }
+    if (!playable && !gitUrl) {
+      alert('Укажите ссылку на GitHub');
+      return;
+    }
+
     const form = new FormData();
-    form.append('file', file);
+    if (playable && zipFile) form.append('file', zipFile);
     form.append('cover', cover);
+    form.append('githubUrl', gitUrl);
     form.append('title', title);
     form.append('description', description);
     form.append('uploader', uploader);
+
     selectedGenres.forEach(g => form.append('genres', g));
-    if (addModels && models) Array.from(models).forEach(m => form.append('models', m));
-    if (images) Array.from(images).forEach(img => form.append('images', img));
-    if (videos) Array.from(videos).forEach(vid => form.append('videos', vid));
+
+    if (addModels && models) {
+      Array.from(models).forEach(m => form.append('models', m));
+    }
+    if (images) {
+      Array.from(images).forEach(img => form.append('images', img));
+    }
+    if (videos) {
+      Array.from(videos).forEach(v => form.append('videos', v));
+    }
+
     await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/games`, form, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
     router.push('/games');
   };
@@ -125,28 +141,52 @@ export default function UploadPage() {
     <main className={styles.container}>
       <h1 className={styles.heading}>Загрузить новую игру</h1>
       <form onSubmit={onSubmit} className={styles.form}>
-        {/* ZIP Build */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>ZIP WebGL-билда:</label>
+        {/* Играбельность */}
+        <label className={styles.checkboxGroup}>
           <input
-            type="file"
-            accept=".zip"
-            onChange={onFileChange}
-            className={styles.fileInput}
-            required
+            type="checkbox"
+            checked={playable}
+            onChange={() => setPlayable(v => !v)}
+          />
+          Играбельная в браузере (ZIP WebGL)
+        </label>
+
+        {/* ZIP при необходимости */}
+        {playable && (
+          <div className={styles.formGroup}>
+            <label>ZIP WebGL-билда:</label>
+            <input
+              type="file"
+              accept=".zip"
+              onChange={e => e.target.files && setZipFile(e.target.files[0])}
+              className={styles.fileInput}
+            />
+          </div>
+        )}
+
+        {/* GitHub URL */}
+        <div className={styles.formGroup}>
+          <label>GitHub URL:</label>
+          <input
+            type="url"
+            value={gitUrl}
+            onChange={e => setGitUrl(e.target.value)}
+            placeholder="https://github.com/..."
+            className={styles.input}
           />
         </div>
+
         {/* Cover */}
         <div className={styles.formGroup}>
-          <label className={styles.label}>Главное фото (cover):</label>
+          <label>Главное фото (cover):</label>
           <input
             type="file"
             accept="image/*"
-            onChange={onCoverChange}
+            onChange={e => e.target.files && setCover(e.target.files[0])}
             className={styles.fileInput}
-            required
           />
         </div>
+
         {/* Title */}
         <div className={styles.formGroup}>
           <label className={styles.label}>Название:</label>
@@ -157,6 +197,7 @@ export default function UploadPage() {
             required
           />
         </div>
+
         {/* Description */}
         <div className={styles.formGroup}>
           <label className={styles.label}>Описание:</label>
@@ -167,22 +208,16 @@ export default function UploadPage() {
             required
           />
         </div>
-        {/* Genres Multi-Select */}
+
+        {/* Жанры */}
         <div className={styles.formGroup} ref={genreRef}>
           <label className={styles.label}>Жанры:</label>
-          <div className={styles.genreSelect} onClick={() => { /* клики внутри не закроют */ }}>
-            <div className={styles.selectedContainer}>
+          <div className={styles.genreSelect}>
+            <div className={styles.selectedContainer} onClick={() => setDropdownOpen(true)}>
               {selectedGenres.map(g => (
-                <span
-                  key={g}
-                  className={styles.genreBadge}
-                  onClick={e => e.stopPropagation()}
-                >
+                <span key={g} className={styles.genreBadge}>
                   {g}{' '}
-                  <button
-                    type="button"
-                    onClick={() => toggleGenre(g)}
-                  >
+                  <button type="button" onClick={() => toggleGenre(g)}>
                     ×
                   </button>
                 </span>
@@ -223,7 +258,8 @@ export default function UploadPage() {
             )}
           </div>
         </div>
-        {/* Add Models */}
+
+        {/* 3D модели */}
         <div className={styles.checkboxGroup}>
           <input
             type="checkbox"
@@ -234,9 +270,7 @@ export default function UploadPage() {
         </div>
         {addModels && (
           <div className={styles.formGroup}>
-            <label className={styles.label}>
-              Выбрать модели (.glb, .gltf):
-            </label>
+            <label className={styles.label}>Выбрать модели (.glb, .gltf):</label>
             <input
               type="file"
               accept=".glb,.gltf"
@@ -246,7 +280,8 @@ export default function UploadPage() {
             />
           </div>
         )}
-        {/* Images */}
+
+        {/* Изображения */}
         <div className={styles.formGroup}>
           <label className={styles.label}>Изображения игры:</label>
           <input
@@ -257,7 +292,8 @@ export default function UploadPage() {
             className={styles.fileInput}
           />
         </div>
-        {/* Videos */}
+
+        {/* Видео */}
         <div className={styles.formGroup}>
           <label className={styles.label}>Видео:</label>
           <input
@@ -268,6 +304,7 @@ export default function UploadPage() {
             className={styles.fileInput}
           />
         </div>
+
         {/* Submit */}
         <button type="submit" className={styles.submitButton}>
           Загрузить

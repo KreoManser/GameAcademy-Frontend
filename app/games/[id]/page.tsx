@@ -12,6 +12,8 @@ type Game = {
   videos: string[];
   genres: string[];
   cover?: string;
+  playable: boolean;
+  githubUrl: string;
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
@@ -74,16 +76,16 @@ export default async function GameOverview({
               ))}
             </div>
           )}
-          <Link href={`/games/${id}/play`} className={styles.button}>
-            Играть ▶️
-          </Link>
-          <Link
-            href={`https://github.com/your-repo/${id}`}
-            target="_blank"
-            className={styles.button}
-          >
-            GitHub
-          </Link>
+          {game.playable && (
+            <Link href={`/games/${id}/play`} className={styles.button}>
+                Играть ▶️
+            </Link>
+            )}
+            {game.githubUrl && (
+            <Link href={game.githubUrl} target="_blank" className={styles.button}>
+                GitHub
+            </Link>
+            )}
         </aside>
       </div>
 
