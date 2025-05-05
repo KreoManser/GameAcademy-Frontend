@@ -23,9 +23,6 @@ export default async function PlayPage({
       </nav>
 
       <div className={styles.headerRow}>
-        {/* <a href={`/games/${id}`} className={styles.backButton}>
-          ← Назад к обзору
-        </a> */}
         <Link href={`/games/${id}`} className={styles.backButton}>
           ← Назад к обзору
         </Link>

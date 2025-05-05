@@ -106,6 +106,10 @@ export default function UploadPage() {
       alert('Укажите ссылку на GitHub');
       return;
     }
+    if ((!images || images.length === 0) && (!videos || videos.length === 0)) {
+      alert('Загрузите хотя бы одно изображение или видео');
+      return;
+    }
 
     const form = new FormData();
     if (playable && zipFile) form.append('file', zipFile);
