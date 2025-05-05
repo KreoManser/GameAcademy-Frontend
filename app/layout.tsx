@@ -29,7 +29,7 @@ export default function RootLayout({
         <Header />
         <UnityCleanup />
         {/* здесь обёртываем всё содержимое клиентским компонентом */}
-        <ClientWrapper>
+        <ClientWrapper className="mainContent">
           {children}
         </ClientWrapper>
       </body>

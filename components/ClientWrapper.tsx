@@ -3,11 +3,19 @@
 
 import { usePathname } from 'next/navigation'
 
+interface ClientWrapperProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
 export default function ClientWrapper({
   children,
-}: {
-  children: React.ReactNode
-}) {
-  const pathname = usePathname()
-  return <div key={pathname}>{children}</div>
+  className,
+}: ClientWrapperProps) {
+  const pathname = usePathname();
+  return (
+    <div key={pathname} className={className}>
+      {children}
+    </div>
+  );
 }

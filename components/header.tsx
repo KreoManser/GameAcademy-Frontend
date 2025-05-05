@@ -1,6 +1,7 @@
+// components/header.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './header.module.css';
@@ -9,9 +10,32 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const avatarWrapperRef = useRef<HTMLDivElement>(null);
 
+  // обновляем статус залогинил ли пользователь
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem('token'));
+  }, [pathname]);
+
+  // 1. Закрываем меню при клике вне области аватара
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        menuOpen &&
+        avatarWrapperRef.current &&
+        !avatarWrapperRef.current.contains(e.target as Node)
+      ) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [menuOpen]);
+
+  // 2. Закрываем меню при смене маршрута
+  useEffect(() => {
+    setMenuOpen(false);
   }, [pathname]);
 
   const handleLogout = () => {
@@ -21,27 +45,46 @@ export default function Header() {
 
   return (
     <header className={styles.header}>
-      <h1 className={styles.brand}>
-        <Link href="/" className={styles.brandLink}>
-          GameAcademy
-        </Link>
-      </h1>
-      <nav className={styles.nav}>
-        {isLoggedIn ? (
-          <button onClick={handleLogout} className={styles.button}>
-            Выход
-          </button>
-        ) : (
-          <>
-            <Link href="/auth/login" className={styles.link}>
-              Войти
-            </Link>
-            <Link href="/auth/register" className={styles.link}>
-              Зарегистрироваться
-            </Link>
-          </>
-        )}
-      </nav>
+      <div className={styles.brand} onClick={() => router.push('/')}>
+        GameAcademy
+      </div>
+
+      {isLoggedIn ? (
+        <div ref={avatarWrapperRef} className={styles.avatarWrapper}>
+          <div
+            className={styles.avatar}
+            onClick={() => setMenuOpen(v => !v)}
+          >
+            UA
+          </div>
+          {menuOpen && (
+            <nav className={styles.menu}>
+              <Link href="/" className={styles.menuLink} onClick={() => setMenuOpen(false)}>
+                Главная
+              </Link>
+              <Link href="/games" className={styles.menuLink} onClick={() => setMenuOpen(false)}>
+                Игры
+              </Link>
+              <button
+                className={styles.menuLogout}
+                onClick={handleLogout}
+              >
+                Выйти
+              </button>
+            </nav>
+          )}
+        </div>
+      ) : (
+        <nav className={styles.nav}>
+          <Link href="/auth/login" className={styles.navLink}>
+            Войти
+          </Link>
+          <Link href="/auth/register" className={styles.navLink}>
+            Регистрация
+          </Link>
+        </nav>
+      )}
+      <div className={styles.spacer} />
     </header>
   );
 }
