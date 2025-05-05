@@ -9,6 +9,13 @@
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 24px;
+    align-items: stretch;
+}
+
+.mediaBlock,
+.sidebarBlock {
+    height: 100%;
+    overflow: hidden;
 }
 
 .glassBlock {
@@ -20,7 +27,18 @@
 }
 
 .mediaBlock {
-    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    height: 60vh;
+    max-height: 80vh;
+    overflow: hidden;
+}
+
+.mediaBlock .gallery {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
 }
 
 .sidebarBlock {
