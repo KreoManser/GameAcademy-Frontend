@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import styles from './upload.module.css';
 
@@ -131,10 +131,23 @@ export default function UploadPage() {
       Array.from(videos).forEach(v => form.append('videos', v));
     }
 
-    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/games`, form, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    router.push('/games');
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/games`,
+        form,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+      router.push('/games');
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const axiosErr = err as AxiosError<{ message: string }>;
+        if (axiosErr.response?.status === 409) {
+          alert(`Ошибка: Обнаружен дубликат`);
+          return;
+        }
+      }
+      alert(`Не удалось загрузить игру: ${err instanceof Error ? err.message : err}`);
+    }
   };
 
   return (
