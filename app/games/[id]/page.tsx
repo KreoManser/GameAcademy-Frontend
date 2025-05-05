@@ -3,6 +3,7 @@ import Image from 'next/image';
 import ModelsViewerWrapper from './ModelsViewerWrapper';
 import MediaGallery from './MediaGallery';
 import styles from './game-overview.module.css';
+// import CommentsSection from './CommentsSection';
 
 type Game = {
   title: string;
@@ -102,6 +103,7 @@ export default async function GameOverview({
         <h2 className={styles.sectionTitle}>Описание</h2>
         <p>{game.description}</p>
       </section>
+      {/* <CommentsSection gameId={id} /> */}
     </main>
   );
 }

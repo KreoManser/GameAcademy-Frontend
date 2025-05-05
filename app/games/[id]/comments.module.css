@@ -1,0 +1,74 @@
+/* app/games/[id]/comments.module.css */
+.comments {
+    margin-top: 32px;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+}
+
+.item {
+    margin-bottom: 16px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 12px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #0070f3;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.role {
+    font-style: italic;
+}
+
+.time {
+    color: #999;
+}
+
+.content {
+    margin: 8px 0;
+}
+
+.reply {
+    background: none;
+    border: none;
+    color: #0070f3;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.input {
+    width: 100%;
+    min-height: 80px;
+    padding: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.send {
+    padding: 8px 16px;
+    background: #0070f3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 24px;
+}
