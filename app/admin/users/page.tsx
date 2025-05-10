@@ -1,3 +1,4 @@
+// app/admin/users/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -20,13 +21,13 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string>('');
 
+  // Проверяем роль и выкидываем не-админа
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       router.replace('/');
       return;
     }
-
     axios.post(
       'http://localhost:3003/api/user/info',
       {},
@@ -38,15 +39,13 @@ export default function AdminUsersPage() {
         router.replace('/');
       }
     })
-    .catch(() => {
-      router.replace('/');
-    });
+    .catch(() => router.replace('/'));
   }, [router]);
 
+  // Загрузка списка
   useEffect(() => {
     axios
-      .get<UsersResponse>('http://localhost:3003/api/user/users', {
-      })
+      .get<UsersResponse>('http://localhost:3003/api/user/users')
       .then(res => setUsers(res.data.users))
       .catch(() => setError('Не удалось загрузить список пользователей'));
   }, []);
@@ -76,7 +75,9 @@ export default function AdminUsersPage() {
     }
   };
 
-  if (error) return <p className={styles.error}>{error}</p>;
+  if (error) {
+    return <p className={styles.error}>{error}</p>;
+  }
 
   return (
     <main className={styles.container}>
