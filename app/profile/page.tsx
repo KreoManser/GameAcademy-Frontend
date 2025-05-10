@@ -63,7 +63,7 @@ export default function ProfilePage() {
         setProfile(profile)
 
         const resGames = await fetch(
-          `${GAMES_API}/games?uploader=${encodeURIComponent(profile.email)}`,
+          `${GAMES_API}/games?uploader=${encodeURIComponent(userId)}`,
           { cache: 'no-store' }
         )
         if (!resGames.ok) throw new Error(`Ошибка ${resGames.status}`)
@@ -102,7 +102,7 @@ export default function ProfilePage() {
           <h2 className={styles.projectsTitle}>Мои проекты</h2>
           <div className={styles.grid}>
             {games.map((g) => (
-              <Link href={`/games/${g._id}`} key={g._id} className={styles.card}>
+              <Link href={`/games/${g._id}?from=profile`} key={g._id} className={styles.card}>
                 <div className={styles.cover}>
                   {g.cover ? (
                     <Image

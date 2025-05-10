@@ -1,4 +1,3 @@
-// components/header.tsx
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -20,12 +19,10 @@ export default function Header() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const avatarWrapperRef = useRef<HTMLDivElement>(null);
 
-  // Обновляем состояние авторизации
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem('token'));
   }, [pathname]);
 
-  // Подгружаем роль пользователя после логина
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return setUserRole(null);
@@ -45,7 +42,6 @@ export default function Header() {
     });
   }, [isLoggedIn, pathname]);
 
-  // Закрываем меню по клику вне
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -60,7 +56,6 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [menuOpen]);
 
-  // Закрываем меню при смене страницы
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
@@ -87,11 +82,11 @@ export default function Header() {
         {menuOpen && (
             <nav className={styles.menu}>
             <Link
-                href="/"
+                href="/profile"
                 className={styles.menuLink}
                 onClick={() => setMenuOpen(false)}
             >
-                Главная
+                Профиль
             </Link>
             <Link
                 href="/games"

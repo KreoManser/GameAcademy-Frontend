@@ -108,9 +108,8 @@ export default function AdminGamesPage() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Hash</th>
-              <th>Metadata</th>
-              <th>Created At</th>
+              <th>UUID-Hashed</th>
+              <th>Meta</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -119,7 +118,6 @@ export default function AdminGamesPage() {
               <tr key={d._id}>
                 <td className={styles.hashCell}>{d.hash}</td>
                 <td><pre className={styles.meta}>{JSON.stringify(d.metadata)}</pre></td>
-                <td>{new Date(d.createdAt).toLocaleString()}</td>
                 <td>
                   <button onClick={() => deleteDup(d._id)} className={styles.deleteBtn}>
                     Удалить

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import ModelsViewerWrapper from './ModelsViewerWrapper';
 import MediaGallery from './MediaGallery';
 import styles from './game-overview.module.css';
+import { BreadcrumbsAndHeader } from './BreadcrumbsAndHeader';
 // import CommentsSection from './CommentsSection';
 
 type Game = {
@@ -24,29 +25,24 @@ const VIDEOS_BASE = process.env.NEXT_PUBLIC_MINIO_VIDEOS_BASE_URL!;
 
 export default async function GameOverview({
   params,
+  searchParams
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string },
+  searchParams: { from?: string }
 }) {
-  const { id } = await params;
+  const { id } = params;
+  const from = searchParams.from
   const res = await fetch(`${API_URL}/games/${id}`, { cache: 'no-store' });
   if (!res.ok) throw new Error('Не удалось загрузить игру');
   const game: Game = await res.json();
 
+  const playHref = from
+    ? `/games/${id}/play?from=${from}`
+    : `/games/${id}/play`
+
   return (
     <main className={styles.container}>
-      <nav className={styles.breadcrumbs}>
-        <Link href="/games" className={styles.breadcrumbLink}>
-          Все проекты
-        </Link>{' '}
-        / <span>{game.title}</span>
-      </nav>
-
-      <div className={styles.headerRow}>
-        <Link href="/games" className={styles.backButton}>
-          ← Все игры
-        </Link>
-        <h1 className={styles.title}>{game.title}</h1>
-      </div>
+      <BreadcrumbsAndHeader title={game.title} id={id} />
 
       {/* === ТОП: две колонки === */}
       <div className={styles.topRow}>
@@ -81,7 +77,7 @@ export default async function GameOverview({
             </div>
           )}
           {game.playable && (
-            <Link href={`/games/${id}/play`} className={styles.button}>Играть ▶️</Link>
+            <Link href={playHref} className={styles.button}>Играть ▶️</Link>
           )}
           {game.githubUrl && (
             <Link href={game.githubUrl} target="_blank" className={styles.button}>GitHub</Link>

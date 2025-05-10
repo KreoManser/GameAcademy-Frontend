@@ -10,7 +10,7 @@ function parseJwt<T extends Record<string, unknown>>(token: string): T {
   return JSON.parse(atob(payload)) as T;
 }
 
-type JwtPayload = { sub: string };
+type JwtPayload = { sub?: string; id?: string };
 
 const ALL_GENRES = [
   'Экшен',
@@ -26,6 +26,7 @@ export default function UploadPage() {
   const router = useRouter();
 
   const [uploader, setUploader] = useState<string>('');
+  const [role, setRole] = useState<string | null>(null);
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -33,7 +34,28 @@ export default function UploadPage() {
       return;
     }
     try {
-      setUploader(parseJwt<JwtPayload>(token).sub);
+      const payload = parseJwt<JwtPayload>(token);
+      const userId = payload.sub ?? payload.id;
+      if (!userId) throw new Error();
+      setUploader(userId);
+
+      axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL_API}/user/info`,
+        { id: userId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      .then(res => {
+        const { profile: { role } } = res.data as { profile: { role: string } };
+        if (role !== 'Admin') {
+          router.replace('/');
+        } else {
+          setRole(role);
+        }
+      })
+      .catch(() => {
+        router.replace('/');
+      });
+
     } catch {
       router.push('/auth/login');
     }
@@ -149,6 +171,10 @@ export default function UploadPage() {
       alert(`Не удалось загрузить игру: ${err instanceof Error ? err.message : err}`);
     }
   };
+
+  if (role === null) {
+    return <p>Проверяем доступ...</p>;
+  }
 
   return (
     <main className={styles.container}>
