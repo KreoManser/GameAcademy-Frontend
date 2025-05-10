@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import styles from './games.module.css'
 import { usePathname } from 'next/navigation'
+import axios from 'axios'
 
 type Game = {
   _id: string
@@ -15,10 +16,13 @@ type Game = {
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!
+const AUTH_API = process.env.NEXT_PUBLIC_API_URL_API!
 const IMAGES_BASE = process.env.NEXT_PUBLIC_MINIO_IMAGES_BASE_URL!
 
 export default function GamesList() {
-    const pathname = usePathname()
+//   const router = useRouter()
+  const pathname = usePathname()
+
   const [allGames, setAllGames] = useState<Game[]>([])
   const [searchResults, setSearchResults] = useState<Game[]>([])
   const [q, setQ] = useState('')
@@ -26,12 +30,17 @@ export default function GamesList() {
   const inputRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
+  // роль пользователя
+  const [userRole, setUserRole] = useState<string | null>(null)
+
+  // подгружаем игры
   useEffect(() => {
     fetch(`${API_URL}/games`)
       .then(r => r.json())
       .then((data: Game[]) => setAllGames(data))
   }, [])
 
+  // поиск
   useEffect(() => {
     if (!q) {
       setSearchResults([])
@@ -44,6 +53,24 @@ export default function GamesList() {
       .then((data: Game[]) => setSearchResults(data))
   }, [q])
 
+  // загружаем роль из профиля
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (!token) return
+
+    const { sub: userId } = JSON.parse(atob(token.split('.')[1])) as { sub: string }
+    axios.post(
+      `${AUTH_API}/user/info`,
+      { id: userId },
+      { headers: { Authorization: `Bearer ${token}` } }
+    ).then(res => {
+      setUserRole(res.data.profile.role)
+    }).catch(() => {
+      setUserRole(null)
+    })
+  }, [])
+
+  // закрытие автодопа
   useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
       const tgt = e.target as Node
@@ -60,6 +87,7 @@ export default function GamesList() {
     return () => document.removeEventListener('mousedown', onMouseDown)
   }, [])
 
+  // позиционирование выпадашки
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
   useEffect(() => {
     if (open && inputRef.current) {
@@ -83,9 +111,13 @@ export default function GamesList() {
       <div className={styles.container}>
         <header className={styles.pageHeader}>
           <h1>Все проекты</h1>
-          <Link href="/upload">
-            <button className={styles.uploadButton}>Новый проект</button>
-          </Link>
+
+          {/* рендерим кнопку только для Admin */}
+          {userRole === 'Admin' && (
+            <Link href="/upload">
+              <button className={styles.uploadButton}>Новый проект</button>
+            </Link>
+          )}
         </header>
 
         <div className={styles.searchWrapper} key={pathname}>
