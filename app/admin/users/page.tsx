@@ -1,4 +1,3 @@
-// app/admin/users/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -21,7 +20,6 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string>('');
 
-  // Проверяем роль и выкидываем не-админа
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -42,7 +40,6 @@ export default function AdminUsersPage() {
     .catch(() => router.replace('/'));
   }, [router]);
 
-  // Загрузка списка
   useEffect(() => {
     axios
       .get<UsersResponse>('http://localhost:3003/api/user/users')

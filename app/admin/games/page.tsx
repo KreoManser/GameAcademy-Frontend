@@ -1,4 +1,3 @@
-// app/admin/games/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -27,7 +26,6 @@ export default function AdminGamesPage() {
   const [dups, setDups] = useState<Duplicate[]>([]);
   const [error, setError] = useState<string>('');
 
-  // 1) проверка роли
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return router.replace('/');
@@ -41,7 +39,6 @@ export default function AdminGamesPage() {
     }).catch(() => router.replace('/'));
   }, [router]);
 
-  // 2) загрузка игр + дубликатов
   useEffect(() => {
     axios.get<{ games: Game[] }>('http://localhost:3001/api/admin/games')
       .then(res => setGames(res.data.games))
