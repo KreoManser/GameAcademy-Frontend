@@ -4,6 +4,7 @@ import ModelsViewerWrapper from './ModelsViewerWrapper';
 import MediaGallery from './MediaGallery';
 import styles from './game-overview.module.css';
 import { BreadcrumbsAndHeader } from './BreadcrumbsAndHeader';
+import ClientCommentsSection from './ClientCommentsSection';
 // import CommentsSection from './CommentsSection';
 
 type Game = {
@@ -99,6 +100,11 @@ export default async function GameOverview({
       <section className={`${styles.glassBlock} ${styles.details}`}>
         <h2 className={styles.sectionTitle}>Описание</h2>
         <p>{game.description}</p>
+      </section>
+
+      {/* === Блок 5: Комментарии === */}
+      <section className={styles.commentsSection}>
+        <ClientCommentsSection gameId={id} />
       </section>
 
     </main>

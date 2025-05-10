@@ -93,7 +93,7 @@ export default function Header() {
                 className={styles.menuLink}
                 onClick={() => setMenuOpen(false)}
             >
-                Проекты
+                Библиотека проектов
             </Link>
             {userRole === 'Admin' && (
                 <>
