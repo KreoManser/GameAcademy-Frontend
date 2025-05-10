@@ -1,6 +1,7 @@
-// app/admin/users/page.tsx  (или где у вас AdminUsersPage)
 'use client';
+
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import styles from './admin-users.module.css';
 
@@ -15,25 +16,60 @@ interface UsersResponse {
 }
 
 export default function AdminUsersPage() {
+  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.replace('/');
+      return;
+    }
+
+    axios.post(
+      'http://localhost:3003/api/user/info',
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+    .then(res => {
+      const { profile } = res.data as { profile: { role: string } };
+      if (profile.role !== 'Admin') {
+        router.replace('/');
+      }
+    })
+    .catch(() => {
+      router.replace('/');
+    });
+  }, [router]);
+
+  useEffect(() => {
     axios
-      .get<UsersResponse>('http://localhost:3003/api/user/users')
+      .get<UsersResponse>('http://localhost:3003/api/user/users', {
+      })
       .then(res => setUsers(res.data.users))
       .catch(() => setError('Не удалось загрузить список пользователей'));
   }, []);
 
   const onRoleChange = async (email: string, newRole: string) => {
-    await axios.post('http://localhost:3003/api/user/users/change-role', { email, newRole });
-    setUsers(u => u.map(x => x.email === email ? { ...x, role: newRole } : x));
+    try {
+      await axios.post(
+        'http://localhost:3003/api/user/users/change-role',
+        { email, newRole }
+      );
+      setUsers(u => u.map(x => x.email === email ? { ...x, role: newRole } : x));
+    } catch {
+      alert('Ошибка при смене роли');
+    }
   };
 
   const onDelete = async (email: string) => {
     if (!confirm(`Удалить пользователя ${email}?`)) return;
     try {
-      await axios.post('http://localhost:3003/api/user/delete', { email });
+      await axios.post(
+        'http://localhost:3003/api/user/delete',
+        { email }
+      );
       setUsers(u => u.filter(x => x.email !== email));
     } catch {
       alert('Ошибка при удалении пользователя');
