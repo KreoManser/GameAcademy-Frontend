@@ -62,7 +62,7 @@ export default function AdminGamesPage() {
   const deleteDup = async (id: string) => {
     if (!confirm('Удалить запись дубликата?')) return;
     try {
-      await axios.post('http://localhost:3003/api/admin/duplicates/delete', { id });
+      await axios.post('http://localhost:3001/api/admin/duplicates/delete', { id });
       setDups(d => d.filter(x => x._id !== id));
     } catch {
       alert('Ошибка при удалении дубликата');

@@ -89,7 +89,6 @@ export default async function GameOverview({
       {/* === Блок 3: 3D модели === */}
       {game.models.length > 0 && (
         <section className={`${styles.glassBlock} ${styles.modelsSection}`}>
-          <h2 className={styles.modelsTitle}>3D Модели</h2>
           <div className={styles.modelsGrid}>
             <ModelsViewerWrapper models={game.models} baseUrl={MODELS_BASE} />
           </div>
